@@ -1,0 +1,24 @@
+{
+  "name": "agent-data-forge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agent benchmark dataset discovery, schema harvesting, and data package generation.",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/cli/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "forge": "tsx src/cli/index.ts"
+  },
+  "bin": {
+    "agent-data-forge": "./dist/cli/index.js"
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

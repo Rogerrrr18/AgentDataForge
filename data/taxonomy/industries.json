@@ -1,0 +1,86 @@
+[
+  {
+    "slug": "customer-service",
+    "label": "Customer Service",
+    "description": "Support, complaints, refunds, issue resolution, and service recovery.",
+    "agentWorkflows": ["ticket triage", "refund handling", "escalation", "FAQ grounding"]
+  },
+  {
+    "slug": "finance",
+    "label": "Finance",
+    "description": "Banking, insurance, financial analysis, complaints, and risk review.",
+    "agentWorkflows": ["claim review", "risk analysis", "complaint classification", "financial QA"]
+  },
+  {
+    "slug": "healthcare",
+    "label": "Healthcare",
+    "description": "Medical QA, clinical documentation, triage assistance, and safety-sensitive support.",
+    "agentWorkflows": ["medical QA", "patient intake", "clinical summarization", "safety escalation"]
+  },
+  {
+    "slug": "legal",
+    "label": "Legal",
+    "description": "Contract review, legal research, compliance, and policy interpretation.",
+    "agentWorkflows": ["contract extraction", "case research", "compliance review", "policy QA"]
+  },
+  {
+    "slug": "education",
+    "label": "Education",
+    "description": "Tutoring, assessment, course support, and learning feedback.",
+    "agentWorkflows": ["tutoring", "grading", "feedback generation", "curriculum QA"]
+  },
+  {
+    "slug": "software",
+    "label": "Software Engineering",
+    "description": "Coding agents, issue resolution, repository navigation, and release work.",
+    "agentWorkflows": ["bug fixing", "code review", "test generation", "permission-aware execution"]
+  },
+  {
+    "slug": "research",
+    "label": "Research",
+    "description": "Literature review, synthesis, citation grounding, and data analysis.",
+    "agentWorkflows": ["paper search", "evidence synthesis", "citation audit", "dataset analysis"]
+  },
+  {
+    "slug": "procurement",
+    "label": "Procurement",
+    "description": "Vendor comparison, purchasing workflows, and contract intake.",
+    "agentWorkflows": ["vendor comparison", "quote extraction", "purchase approval", "contract handoff"]
+  },
+  {
+    "slug": "hr",
+    "label": "Human Resources",
+    "description": "Recruiting, onboarding, policy support, and employee service workflows.",
+    "agentWorkflows": ["resume screening", "interview scheduling", "onboarding", "policy QA"]
+  },
+  {
+    "slug": "ecommerce",
+    "label": "E-commerce",
+    "description": "Shopping assistance, order support, product QA, and returns.",
+    "agentWorkflows": ["product recommendation", "order tracking", "returns", "review mining"]
+  },
+  {
+    "slug": "logistics",
+    "label": "Logistics",
+    "description": "Shipment tracking, routing, warehouse coordination, and exception handling.",
+    "agentWorkflows": ["shipment exception", "route planning", "warehouse update", "ETA communication"]
+  },
+  {
+    "slug": "manufacturing",
+    "label": "Manufacturing",
+    "description": "Operations, maintenance, quality control, and supply-chain workflows.",
+    "agentWorkflows": ["quality inspection", "maintenance planning", "incident report", "inventory check"]
+  },
+  {
+    "slug": "government",
+    "label": "Government",
+    "description": "Public services, policy guidance, citizen support, and open data workflows.",
+    "agentWorkflows": ["form assistance", "policy lookup", "case routing", "public data QA"]
+  },
+  {
+    "slug": "general",
+    "label": "General",
+    "description": "Cross-domain datasets and benchmarks with no specific industry focus.",
+    "agentWorkflows": ["classification", "QA", "summarization", "reasoning"]
+  }
+]
