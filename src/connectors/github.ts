@@ -3,6 +3,8 @@
  */
 
 import type { DatasetCandidate, RiskLevel } from "../types.js";
+import { inferIndustrySlugs } from "../core/industry.js";
+import { fetchWithRetry } from "./http.js";
 
 type GitHubRepository = {
   id: number;
@@ -37,7 +39,7 @@ export async function searchGitHubRepositories(input: {
   url.searchParams.set("order", "desc");
   url.searchParams.set("per_page", String(input.limit));
 
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     headers: buildHeaders(),
   });
   if (!response.ok) {
@@ -64,7 +66,7 @@ function mapRepository(repo: GitHubRepository): DatasetCandidate {
     languages: repo.language ? [repo.language.toLowerCase()] : [],
     taskTypes: inferTasks(text),
     modalities: inferModalities(text),
-    domains: inferDomains(text),
+    domains: inferIndustrySlugs(text),
     fileFormats: [],
     hasDownload: true,
     hasSamples: Boolean(repo.description),
@@ -117,17 +119,4 @@ function inferModalities(text: string): string[] {
   if (/audio|speech/.test(normalized)) modalities.add("audio");
   if (/video/.test(normalized)) modalities.add("video");
   return [...modalities];
-}
-
-function inferDomains(text: string): string[] {
-  const normalized = text.toLowerCase();
-  const domains = new Set<string>();
-  if (/finance|bank|insurance/.test(normalized)) domains.add("finance");
-  if (/medical|health|clinical/.test(normalized)) domains.add("healthcare");
-  if (/legal|law|contract/.test(normalized)) domains.add("legal");
-  if (/customer|support|complaint/.test(normalized)) domains.add("customer-service");
-  if (/education|student|exam/.test(normalized)) domains.add("education");
-  if (/code|software|swe/.test(normalized)) domains.add("software");
-  if (domains.size === 0) domains.add("general");
-  return [...domains];
 }

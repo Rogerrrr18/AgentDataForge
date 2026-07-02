@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-06-25",
+  "sources": [
+    {
+      "id": "sec-companyfacts",
+      "name": "SEC EDGAR Company Facts API",
+      "sourceType": "official_regulatory_api",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+      "highValueBecause": [
+        "auditable financial facts",
+        "standard XBRL concepts",
+        "filing-level provenance"
+      ],
+      "redistributionRisk": "low_to_medium",
+      "productionNotes": [
+        "set a descriptive User-Agent",
+        "cache responses",
+        "respect SEC request-rate guidance"
+      ]
+    },
+    {
+      "id": "sec-submissions",
+      "name": "SEC EDGAR Submissions API",
+      "sourceType": "official_regulatory_api",
+      "url": "https://data.sec.gov/submissions/CIK0000320193.json",
+      "highValueBecause": [
+        "latest filing stream",
+        "primary document links",
+        "event monitoring"
+      ],
+      "redistributionRisk": "low_to_medium",
+      "productionNotes": [
+        "normalize CIKs",
+        "store accession numbers",
+        "link every derived claim to source URL"
+      ]
+    },
+    {
+      "id": "fred",
+      "name": "FRED CSV downloads",
+      "sourceType": "public_macro_data_portal",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10",
+      "highValueBecause": [
+        "macro regime features",
+        "simple CSV ingestion",
+        "long history"
+      ],
+      "redistributionRisk": "medium",
+      "productionNotes": [
+        "retain series IDs",
+        "show units and frequency",
+        "check original source citation requirements"
+      ]
+    },
+    {
+      "id": "nasdaq-historical",
+      "name": "Nasdaq historical quote endpoint",
+      "sourceType": "public_market_data_endpoint",
+      "url": "https://api.nasdaq.com/api/quote/AAPL/historical?assetclass=stocks&fromdate=2026-05-01&todate=2026-06-25&limit=9999",
+      "highValueBecause": [
+        "recent OHLCV context",
+        "event-window analysis",
+        "client-friendly price tables"
+      ],
+      "redistributionRisk": "high",
+      "productionNotes": [
+        "use only for prototype/demo",
+        "replace with licensed market-data vendor in production"
+      ]
+    }
+  ]
+}

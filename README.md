@@ -13,7 +13,9 @@ The project is intentionally separate from Zeval:
 search query
   -> source connectors
   -> candidate catalog
+  -> industry segmentation
   -> schema completeness profiler
+  -> data value enhancement plan
   -> benchmark manifest
   -> exportable dataset package
 ```
@@ -24,8 +26,16 @@ search query
 npm install
 npm run forge -- discover "customer support agent benchmark" --source huggingface --limit 5
 npm run forge -- manifest examples/minimal-cases.jsonl
+npm run forge -- manifest examples/customer-support-bench.jsonl
 npm test
 ```
+
+`discover` and `manifest` now attach:
+
+- `industryProfile`: primary industry, confidence, matched keywords, and workflow hints.
+- `enrichmentPlan`: current value tier, target tier, estimated readiness lift, automation steps, and packaging risks.
+
+This makes thin public datasets actionable: AgentDataForge can explain whether a candidate is merely metadata, a candidate dataset, a benchmark seed, or close to an eval-ready/commercial pack.
 
 ## What This Is For
 
@@ -51,7 +61,9 @@ Included in v0.1:
 
 - Hugging Face and GitHub metadata discovery.
 - Industry/domain taxonomy seeded from Zeval BenchHub ideas and expanded for Agent datasets.
+- Shared industry segmentation across discovery and manifest generation.
 - Schema completeness scoring for task, gold, context, trace, environment, provenance, and license fields.
+- Automated data value enhancement planning for missing gold outputs, rubrics, checkers, environment state, provenance, and license review.
 - Benchmark manifest generation from JSONL cases.
 
 Not included yet:

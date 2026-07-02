@@ -99,7 +99,9 @@ export type BenchmarkManifest = {
     schemaCompleteness: number;
     readinessLevel: 1 | 2 | 3 | 4 | 5;
   };
+  industryProfile: IndustryProfile;
   schemaProfile: SchemaProfile;
+  enrichmentPlan: DataValueEnhancementPlan;
   recommendedNextActions: string[];
 };
 
@@ -108,4 +110,39 @@ export type IndustryTaxonomyItem = {
   label: string;
   description: string;
   agentWorkflows: string[];
+};
+
+export type IndustryMatch = {
+  slug: string;
+  label: string;
+  confidence: number;
+  matchedKeywords: string[];
+  workflowHints: string[];
+};
+
+export type IndustryProfile = {
+  primaryIndustry: string;
+  matches: IndustryMatch[];
+  isIndustrySpecific: boolean;
+};
+
+export type DataValueTier = "raw_metadata" | "candidate_dataset" | "benchmark_seed" | "eval_ready_pack" | "commercial_pack";
+
+export type EnrichmentStep = {
+  id: string;
+  title: string;
+  priority: "critical" | "high" | "medium";
+  automatable: boolean;
+  inputs: string[];
+  outputs: string[];
+};
+
+export type DataValueEnhancementPlan = {
+  currentTier: DataValueTier;
+  targetTier: DataValueTier;
+  estimatedReadinessLift: number;
+  industry: string;
+  workflowFocus: string[];
+  steps: EnrichmentStep[];
+  packagingRisks: string[];
 };

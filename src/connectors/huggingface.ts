@@ -3,6 +3,8 @@
  */
 
 import type { DatasetCandidate, RiskLevel } from "../types.js";
+import { inferIndustrySlugs } from "../core/industry.js";
+import { fetchWithRetry } from "./http.js";
 
 type HuggingFaceDataset = {
   id: string;
@@ -34,7 +36,7 @@ export async function searchHuggingFaceDatasets(input: {
   url.searchParams.set("sort", "downloads");
   url.searchParams.set("direction", "-1");
 
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     headers: { "User-Agent": "agent-data-forge/0.1" },
   });
   if (!response.ok) {
@@ -60,7 +62,7 @@ function mapHuggingFaceDataset(item: HuggingFaceDataset): DatasetCandidate {
     languages: tagValues(tags, "language:"),
     taskTypes: [...tagValues(tags, "task_categories:"), ...(tags.includes("benchmark") ? ["benchmark"] : [])],
     modalities: tagValues(tags, "modality:"),
-    domains: inferDomains(`${item.id} ${item.description ?? ""} ${tags.join(" ")}`),
+    domains: inferIndustrySlugs(`${item.id} ${item.description ?? ""} ${tags.join(" ")}`),
     fileFormats: tagValues(tags, "format:"),
     hasDownload: Boolean(item.downloads && item.downloads > 0),
     hasSamples: Boolean(item.description),
@@ -92,17 +94,4 @@ function inferRisk(licenseName: string | null, gated: boolean): RiskLevel {
   if (/mit|apache|bsd|cc-by|cc0/i.test(licenseName)) return "low";
   if (/gpl|agpl|cc-by-sa|cc-by-nc/i.test(licenseName)) return "medium";
   return "medium";
-}
-
-function inferDomains(text: string): string[] {
-  const normalized = text.toLowerCase();
-  const domains = new Set<string>();
-  if (/finance|financial|bank|insurance|claim/.test(normalized)) domains.add("finance");
-  if (/medical|health|clinical|patient/.test(normalized)) domains.add("healthcare");
-  if (/legal|law|contract/.test(normalized)) domains.add("legal");
-  if (/support|customer|complaint|refund/.test(normalized)) domains.add("customer-service");
-  if (/education|exam|student|tutor/.test(normalized)) domains.add("education");
-  if (/code|software|github|repository/.test(normalized)) domains.add("software");
-  if (domains.size === 0) domains.add("general");
-  return [...domains];
 }

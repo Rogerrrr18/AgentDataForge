@@ -3,6 +3,8 @@
  */
 
 import type { BenchmarkCase, BenchmarkManifest, DatasetCandidate } from "../types.js";
+import { buildDataValueEnhancementPlan } from "./enrichment.js";
+import { profileIndustry } from "./industry.js";
 import { profileDatasetSchema } from "./schema-profiler.js";
 
 /**
@@ -18,6 +20,8 @@ export function buildBenchmarkManifest(input: {
   cases: BenchmarkCase[];
 }): BenchmarkManifest {
   const schemaProfile = profileDatasetSchema({ candidate: input.candidate, cases: input.cases });
+  const industryProfile = profileIndustry({ candidate: input.candidate, cases: input.cases });
+  const enrichmentPlan = buildDataValueEnhancementPlan({ schemaProfile, industryProfile });
   const taskTypes = [...new Set([schemaProfile.taskType, ...input.cases.map((item) => item.taskType).filter(Boolean)])] as BenchmarkManifest["summary"]["taskTypes"];
 
   return {
@@ -26,7 +30,7 @@ export function buildBenchmarkManifest(input: {
     source: {
       name: input.sourceName,
       url: input.sourceUrl ?? input.candidate?.sourceUrl,
-      licenseName: input.candidate?.licenseName ?? null,
+      licenseName: input.candidate?.licenseName ?? inferCaseLicenseName(input.cases),
     },
     summary: {
       caseCount: input.cases.length,
@@ -34,9 +38,21 @@ export function buildBenchmarkManifest(input: {
       schemaCompleteness: schemaProfile.completeness,
       readinessLevel: schemaProfile.readinessLevel,
     },
+    industryProfile,
     schemaProfile,
+    enrichmentPlan,
     recommendedNextActions: recommendedNextActions(schemaProfile.missingCriticalFields),
   };
+}
+
+function inferCaseLicenseName(cases: BenchmarkCase[]): string | null {
+  for (const item of cases) {
+    const record = item as Record<string, unknown>;
+    const metadata = item.metadata ?? {};
+    const licenseName = record.licenseName ?? record.license ?? metadata.licenseName ?? metadata.license;
+    if (typeof licenseName === "string" && licenseName.trim()) return licenseName.trim();
+  }
+  return null;
 }
 
 function recommendedNextActions(missing: string[]): string[] {

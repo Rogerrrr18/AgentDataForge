@@ -102,7 +102,7 @@ function buildSignals(candidate: DatasetCandidate | undefined, cases: BenchmarkC
     signal("toolTrace", hasAnyCaseField(cases, ["trace", "toolCalls", "tool_calls"]) || /tool_calls?|trace|span/.test(sampleText), cases),
     signal("environmentState", hasAnyCaseField(cases, ["environment", "state"]) || /environment|state|sandbox|filesystem|database/.test(sampleText), cases),
     signal("metadata", Boolean(candidate) || hasAnyCaseField(cases, ["metadata"]), cases),
-    signal("license", Boolean(candidate?.licenseName), cases, candidate?.licenseName ? [`license=${candidate.licenseName}`] : []),
+    signal("license", Boolean(candidate?.licenseName ?? inferCaseLicenseName(cases)), cases, candidate?.licenseName ? [`license=${candidate.licenseName}`] : []),
     signal("split", /train|test|validation|dev/.test(sampleText), cases),
   ];
 }
@@ -121,6 +121,16 @@ function hasAnyCaseField(cases: BenchmarkCase[], fields: string[]): boolean {
     const record = item as Record<string, unknown>;
     return fields.some((field) => typeof record[field] !== "undefined");
   });
+}
+
+function inferCaseLicenseName(cases: BenchmarkCase[]): string | null {
+  for (const item of cases) {
+    const record = item as Record<string, unknown>;
+    const metadata = item.metadata ?? {};
+    const licenseName = record.licenseName ?? record.license ?? metadata.licenseName ?? metadata.license;
+    if (typeof licenseName === "string" && licenseName.trim()) return licenseName.trim();
+  }
+  return null;
 }
 
 function inferEvaluatorCandidates(

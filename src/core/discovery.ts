@@ -5,6 +5,8 @@
 import { searchGitHubRepositories } from "../connectors/github.js";
 import { searchHuggingFaceDatasets } from "../connectors/huggingface.js";
 import type { DatasetCandidate, SourceKind } from "../types.js";
+import { buildDataValueEnhancementPlan } from "./enrichment.js";
+import { profileIndustry } from "./industry.js";
 import { profileDatasetSchema } from "./schema-profiler.js";
 
 /**
@@ -17,7 +19,13 @@ export async function discoverCandidates(input: {
   query: string;
   source: Exclude<SourceKind, "manual"> | "all";
   limit: number;
-}): Promise<Array<DatasetCandidate & { schemaCompleteness: number; readinessLevel: number }>> {
+}): Promise<Array<DatasetCandidate & {
+  schemaCompleteness: number;
+  readinessLevel: number;
+  primaryIndustry: string;
+  industryProfile: ReturnType<typeof profileIndustry>;
+  enrichmentPlan: ReturnType<typeof buildDataValueEnhancementPlan>;
+}>> {
   const perSourceLimit = input.source === "all" ? Math.max(1, Math.ceil(input.limit / 2)) : input.limit;
   const batches: DatasetCandidate[][] = [];
   if (input.source === "all" || input.source === "huggingface") {
@@ -35,10 +43,18 @@ export async function discoverCandidates(input: {
   return [...deduped.values()]
     .map((candidate) => {
       const profile = profileDatasetSchema({ candidate });
+      const industryProfile = profileIndustry({ candidate, query: input.query });
+      const enrichmentPlan = buildDataValueEnhancementPlan({
+        schemaProfile: profile,
+        industryProfile,
+      });
       return {
         ...candidate,
         schemaCompleteness: profile.completeness,
         readinessLevel: profile.readinessLevel,
+        primaryIndustry: industryProfile.primaryIndustry,
+        industryProfile,
+        enrichmentPlan,
       };
     })
     .sort((left, right) => right.readinessLevel - left.readinessLevel || right.schemaCompleteness - left.schemaCompleteness)
