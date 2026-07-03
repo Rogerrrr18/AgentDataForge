@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AgentDataForge</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f7f9;
+        --surface: #ffffff;
+        --surface-soft: #fafbfc;
+        --ink: #151a23;
+        --muted: #687386;
+        --line: #dfe4ec;
+        --blue: #2457a7;
+        --green: #16705a;
+        --amber: #9d681c;
+        --red: #a64048;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: var(--bg);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        letter-spacing: 0;
+      }
+
+      button, input, select {
+        font: inherit;
+        letter-spacing: 0;
+      }
+
+      .app {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 64px;
+        padding: 0 28px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border: 1px solid #cbd4e1;
+        border-radius: 7px;
+        background: #fff;
+        color: var(--blue);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .brand strong {
+        display: block;
+        font-size: 15px;
+        line-height: 1.1;
+      }
+
+      .brand span {
+        display: block;
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .chip, .nav-link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+        padding: 7px 10px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: #fff;
+        color: #344257;
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 248px minmax(0, 1fr) 360px;
+        gap: 1px;
+        min-height: calc(100vh - 64px);
+        border-top: 0;
+        background: var(--line);
+      }
+
+      .sidebar, .main, .detail {
+        background: var(--surface);
+        min-width: 0;
+      }
+
+      .sidebar {
+        padding: 22px 18px;
+      }
+
+      .main {
+        padding: 22px;
+      }
+
+      .detail {
+        padding: 22px 18px;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      h1, h2, h3, p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 24px;
+        line-height: 1.2;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        font-size: 14px;
+        line-height: 1.25;
+      }
+
+      h3 {
+        font-size: 13px;
+        line-height: 1.25;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .caption {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1px;
+        margin-bottom: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--line);
+      }
+
+      .stat {
+        min-height: 92px;
+        padding: 14px;
+        background: var(--surface);
+      }
+
+      .stat span {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .stat strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 30px;
+        line-height: 1;
+      }
+
+      .stat em {
+        display: block;
+        margin-top: 9px;
+        color: var(--muted);
+        font-size: 12px;
+        font-style: normal;
+        line-height: 1.35;
+      }
+
+      .domain-list {
+        display: grid;
+        gap: 6px;
+      }
+
+      .domain-button {
+        width: 100%;
+        min-height: 42px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 9px;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        text-align: left;
+      }
+
+      .domain-button:hover, .domain-button.active {
+        border-color: #c9d4e3;
+        background: var(--surface-soft);
+      }
+
+      .domain-button span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #c5ccd7;
+      }
+
+      .status-dot.live {
+        background: var(--green);
+      }
+
+      .filters {
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) 150px 150px;
+        gap: 10px;
+        margin: 16px 0;
+      }
+
+      .field {
+        display: grid;
+        gap: 5px;
+      }
+
+      .field label {
+        color: #3e4d62;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .field input, .field select {
+        width: 100%;
+        min-height: 36px;
+        padding: 7px 9px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: #fff;
+        color: var(--ink);
+      }
+
+      .asset-table {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--surface);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th, td {
+        padding: 12px 12px;
+        border-bottom: 1px solid #e8ecf2;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #fbfcfd;
+        color: #526074;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      tbody tr {
+        cursor: pointer;
+      }
+
+      tbody tr:hover, tbody tr.selected {
+        background: #f7f9fc;
+      }
+
+      .asset-name {
+        display: grid;
+        gap: 5px;
+      }
+
+      .asset-name strong {
+        font-size: 14px;
+      }
+
+      .asset-name span {
+        color: var(--muted);
+        font-size: 12px;
+        word-break: break-all;
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 22px;
+        padding: 3px 7px;
+        border: 1px solid #d8e0ea;
+        border-radius: 999px;
+        background: #f8fafc;
+        color: #526074;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .coverage {
+        display: grid;
+        gap: 7px;
+        min-width: 112px;
+      }
+
+      .bar {
+        height: 7px;
+        border-radius: 999px;
+        background: #e6eaf0;
+        overflow: hidden;
+      }
+
+      .bar i {
+        display: block;
+        height: 100%;
+        background: var(--blue);
+      }
+
+      .detail-empty {
+        display: grid;
+        min-height: 260px;
+        place-items: center;
+        border: 1px dashed #cbd4e1;
+        border-radius: 8px;
+        color: var(--muted);
+        text-align: center;
+        padding: 20px;
+      }
+
+      .detail-stack {
+        display: grid;
+        gap: 16px;
+      }
+
+      .detail-block {
+        display: grid;
+        gap: 9px;
+      }
+
+      .kv {
+        display: grid;
+        grid-template-columns: 96px minmax(0, 1fr);
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid #edf0f4;
+        font-size: 13px;
+      }
+
+      .kv span {
+        color: var(--muted);
+      }
+
+      .kv strong {
+        min-width: 0;
+        word-break: break-word;
+      }
+
+      pre {
+        max-height: 360px;
+        margin: 0;
+        padding: 12px;
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #111827;
+        color: #dce8f8;
+        font-size: 12px;
+        line-height: 1.55;
+        white-space: pre-wrap;
+      }
+
+      .file-list {
+        margin-top: 20px;
+        border-top: 1px solid var(--line);
+        padding-top: 16px;
+      }
+
+      .file-list ul {
+        list-style: none;
+        margin: 10px 0 0;
+        padding: 0;
+        display: grid;
+        gap: 7px;
+      }
+
+      .file-list li {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .file-list span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      @media (max-width: 1120px) {
+        .shell {
+          grid-template-columns: 220px minmax(0, 1fr);
+        }
+        .detail {
+          grid-column: 1 / -1;
+          border-top: 1px solid var(--line);
+        }
+      }
+
+      @media (max-width: 760px) {
+        .topbar {
+          position: static;
+          align-items: flex-start;
+          flex-direction: column;
+          padding: 14px;
+        }
+        .shell {
+          display: flex;
+          flex-direction: column;
+        }
+        .main { order: 1; }
+        .sidebar { order: 2; }
+        .detail { order: 3; }
+        .sidebar, .main, .detail {
+          padding: 16px;
+          border-bottom: 1px solid var(--line);
+        }
+        .stats, .filters {
+          grid-template-columns: 1fr;
+        }
+        th:nth-child(3), td:nth-child(3) {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">ADF</div>
+          <div>
+            <strong>AgentDataForge</strong>
+            <span>Data governance console</span>
+          </div>
+        </div>
+        <div class="top-actions">
+          <span class="chip">2026-07-03</span>
+          <a class="nav-link" href="./customer-support-bench.md">客服 Bench</a>
+          <a class="nav-link" href="./finance-research-data-pack.md">金融 Pack</a>
+        </div>
+      </header>
+
+      <div class="shell">
+        <aside class="sidebar">
+          <div class="section-title">
+            <h2>场景</h2>
+            <span class="chip">14</span>
+          </div>
+          <div class="domain-list" id="domainList"></div>
+        </aside>
+
+        <main class="main">
+          <div class="section-title">
+            <div>
+              <h1>数据资产</h1>
+              <p class="caption">真实仓库数据 · 无 mock</p>
+            </div>
+          </div>
+
+          <section class="stats" aria-label="summary">
+            <div class="stat"><span>Records</span><strong>515</strong><em>已入库记录</em></div>
+            <div class="stat"><span>Domains</span><strong>2</strong><em>customer-service / finance</em></div>
+            <div class="stat"><span>Workflows</span><strong>21</strong><em>现有 workflow</em></div>
+            <div class="stat"><span>Coverage</span><strong>77%</strong><em>平均字段覆盖</em></div>
+          </section>
+
+          <section class="filters">
+            <div class="field">
+              <label for="search">Search</label>
+              <input id="search" type="search" placeholder="名称、路径、workflow、字段" />
+            </div>
+            <div class="field">
+              <label for="domainFilter">Domain</label>
+              <select id="domainFilter">
+                <option value="all">全部</option>
+                <option value="customer-service">customer-service</option><option value="finance">finance</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="typeFilter">Type</label>
+              <select id="typeFilter">
+                <option value="all">全部</option>
+                <option value="Benchmark JSONL">Benchmark JSONL</option><option value="CSV">CSV</option><option value="JSONL">JSONL</option><option value="JSON">JSON</option>
+              </select>
+            </div>
+          </section>
+
+          <section class="asset-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Asset</th>
+                  <th>Records</th>
+                  <th>Workflow</th>
+                  <th>Coverage</th>
+                </tr>
+              </thead>
+              <tbody id="assetRows"></tbody>
+            </table>
+          </section>
+        </main>
+
+        <aside class="detail">
+          <div class="section-title">
+            <h2>预览</h2>
+          </div>
+          <div id="detailPanel"></div>
+          <div class="file-list">
+            <div class="section-title">
+              <h2>文件</h2>
+              <span class="chip">17</span>
+            </div>
+            <ul>
+              <li><span>data/finance-research/company_metrics.csv</span><strong>19 KB</strong></li><li><span>data/finance-research/company_snapshots.jsonl</span><strong>25 KB</strong></li><li><span>data/finance-research/latest_sec_filings.jsonl</span><strong>21 KB</strong></li><li><span>data/finance-research/macro_indicators_latest.csv</span><strong>22 KB</strong></li><li><span>data/finance-research/pm_research_cards.jsonl</span><strong>3 KB</strong></li><li><span>data/finance-research/recent_market_prices.csv</span><strong>30 KB</strong></li><li><span>data/finance-research/source_catalog.json</span><strong>2 KB</strong></li><li><span>data/taxonomy/industries.json</span><strong>3 KB</strong></li><li><span>docs/.nojekyll</span><strong>1 KB</strong></li><li><span>docs/business-brief.md</span><strong>1 KB</strong></li><li><span>docs/customer-support-bench.md</span><strong>1 KB</strong></li><li><span>docs/data-governance-dashboard.html</span><strong>57 KB</strong></li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <script id="dashboard-data" type="application/json">{"generatedAt":"2026-07-03T03:08:02.467Z","taxonomy":[{"slug":"customer-service","label":"Customer Service","description":"Support, complaints, refunds, issue resolution, and service recovery.","agentWorkflows":["ticket triage","refund handling","escalation","FAQ grounding"]},{"slug":"finance","label":"Finance","description":"Banking, insurance, financial analysis, complaints, and risk review.","agentWorkflows":["claim review","risk analysis","complaint classification","financial QA"]},{"slug":"healthcare","label":"Healthcare","description":"Medical QA, clinical documentation, triage assistance, and safety-sensitive support.","agentWorkflows":["medical QA","patient intake","clinical summarization","safety escalation"]},{"slug":"legal","label":"Legal","description":"Contract review, legal research, compliance, and policy interpretation.","agentWorkflows":["contract extraction","case research","compliance review","policy QA"]},{"slug":"education","label":"Education","description":"Tutoring, assessment, course support, and learning feedback.","agentWorkflows":["tutoring","grading","feedback generation","curriculum QA"]},{"slug":"software","label":"Software Engineering","description":"Coding agents, issue resolution, repository navigation, and release work.","agentWorkflows":["bug fixing","code review","test generation","permission-aware execution"]},{"slug":"research","label":"Research","description":"Literature review, synthesis, citation grounding, and data analysis.","agentWorkflows":["paper search","evidence synthesis","citation audit","dataset analysis"]},{"slug":"procurement","label":"Procurement","description":"Vendor comparison, purchasing workflows, and contract intake.","agentWorkflows":["vendor comparison","quote extraction","purchase approval","contract handoff"]},{"slug":"hr","label":"Human Resources","description":"Recruiting, onboarding, policy support, and employee service workflows.","agentWorkflows":["resume screening","interview scheduling","onboarding","policy QA"]},{"slug":"ecommerce","label":"E-commerce","description":"Shopping assistance, order support, product QA, and returns.","agentWorkflows":["product recommendation","order tracking","returns","review mining"]},{"slug":"logistics","label":"Logistics","description":"Shipment tracking, routing, warehouse coordination, and exception handling.","agentWorkflows":["shipment exception","route planning","warehouse update","ETA communication"]},{"slug":"manufacturing","label":"Manufacturing","description":"Operations, maintenance, quality control, and supply-chain workflows.","agentWorkflows":["quality inspection","maintenance planning","incident report","inventory check"]},{"slug":"government","label":"Government","description":"Public services, policy guidance, citizen support, and open data workflows.","agentWorkflows":["form assistance","policy lookup","case routing","public data QA"]},{"slug":"general","label":"General","description":"Cross-domain datasets and benchmarks with no specific industry focus.","agentWorkflows":["classification","QA","summarization","reasoning"]}],"datasets":[{"id":"customer-support-bench","name":"客服 Agent Benchmark","type":"Benchmark JSONL","path":"examples/customer-support-bench.jsonl","domain":"customer-service","records":8,"fields":["input","context","expected","rubric","checker","trace","environment","metadata"],"workflows":["refund handling","escalation","FAQ grounding","ticket triage","permission boundary","order tracking","retention","missing item"],"modalities":["text","tool_trace","environment_state"],"license":"CC-BY-4.0","provenance":"synthetic","coverage":100,"preview":[{"caseId":"cs_refund_001","taskType":"tool_use","workflow":"refund handling","split":"test","difficulty":"easy","checker":"json_subset"},{"caseId":"cs_escalation_002","taskType":"dialogue","workflow":"escalation","split":"test","difficulty":"medium","checker":"regex_match"},{"caseId":"cs_policy_rag_003","taskType":"rag_qa","workflow":"FAQ grounding","split":"test","difficulty":"easy","checker":"regex_match"},{"caseId":"cs_ticket_triage_004","taskType":"classification","workflow":"ticket triage","split":"dev","difficulty":"medium","checker":"json_exact"},{"caseId":"cs_safety_boundary_005","taskType":"dialogue","workflow":"permission boundary","split":"test","difficulty":"hard","checker":"regex_match"}]},{"id":"finance-company_metrics-csv","name":"Company Metrics","type":"CSV","path":"data/finance-research/company_metrics.csv","domain":"finance","records":91,"fields":["ticker","companyName","cik","periodType","metricKey","concept","label","unit","value","fy","fp","form","filed","end","sourceUrl"],"workflows":["financial QA","metric extraction","fundamental analysis"],"modalities":["text","table"],"license":"source-specific public data","provenance":"source catalog 2026-06-25","coverage":72,"preview":[{"ticker":"AAPL","companyName":"Apple Inc.","cik":"0000320193","periodType":"annual","metricKey":"revenue","concept":"RevenueFromContractWithCustomerExcludingAssessedTax","label":"Revenue","unit":"USD"},{"ticker":"AAPL","companyName":"Apple Inc.","cik":"0000320193","periodType":"annual","metricKey":"net_income","concept":"NetIncomeLoss","label":"Net income","unit":"USD"},{"ticker":"AAPL","companyName":"Apple Inc.","cik":"0000320193","periodType":"annual","metricKey":"operating_income","concept":"OperatingIncomeLoss","label":"Operating income","unit":"USD"},{"ticker":"AAPL","companyName":"Apple Inc.","cik":"0000320193","periodType":"annual","metricKey":"operating_cash_flow","concept":"NetCashProvidedByUsedInOperatingActivities","label":"Operating cash flow","unit":"USD"},{"ticker":"AAPL","companyName":"Apple Inc.","cik":"0000320193","periodType":"annual","metricKey":"capex","concept":"PaymentsToAcquirePropertyPlantAndEquipment","label":"Capital expenditures","unit":"USD"}]},{"id":"finance-company_snapshots-jsonl","name":"Company Snapshots","type":"JSONL","path":"data/finance-research/company_snapshots.jsonl","domain":"finance","records":5,"fields":["recordType","ticker","companyName","cik","thesisTag","secEntity","latestAnnualMetrics","latestQuarterlyMetrics","latestFilings","latestMarketSnapshot","agentReadyFields","sourceUrls","generatedAt"],"workflows":["financial QA","company research"],"modalities":["text","table"],"license":"source-specific public data","provenance":"source catalog 2026-06-25","coverage":76,"preview":[{"recordType":"company_research_snapshot","ticker":"AAPL","companyName":"Apple Inc.","cik":"0000320193","thesisTag":"consumer hardware + services","secEntity":{"sic":"3571","sicDescription":"Electronic Computers","fiscalYearEnd":"0926","exchanges":["Nasdaq"],"tickers":["AAPL"]},"latestAnnualMetrics":{"revenue":{"concept":"RevenueFromContractWithCustomerExcludingAssessedTax","label":"Revenue","unit":"USD","value":416161000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-10-31","end":"2025-09-27","frame":"CY2025"},"net_income":{"concept":"NetIncomeLoss","label":"Net income","unit":"USD","value":112010000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-10-31","end":"2025-09-27","frame":"CY2025"},"operating_income":{"concept":"OperatingIncomeLoss","label":"Operating income","unit":"USD","value":133050000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-10-31","end":"2025-09-27","frame":"CY2025"},"operating_cash_flow":{"concept":"NetCashProvidedByUsedInOperatingActivities","label":"Operating cash flow","unit":"USD","value":111482000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-10-31","end":"2025-09-27","frame":"CY2025"},"capex":{"concept":"PaymentsToAcquirePropertyPlantAndEquipment","label":"Capital expenditures","unit":"USD","value":12715000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-10-31","end":"2025-09-27","frame":"CY2025"},"research_and_development":{"concept":"ResearchAndDevelopmentExpense","label":"Research and development expense","unit":"USD","value":34550000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-10-31","end":"2025-09-27","frame":"CY2025"},"assets":{"concept":"Assets","label":"Assets","unit":"USD","value":359241000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-10-31","end":"2025-09-27"},"liabilities":{"concept":"Liabilities","label":"Liabilities","unit":"USD","value":285508000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-10-31","end":"2025-09-27"},"equity":{"concept":"StockholdersEquity","label":"Stockholders' equity","unit":"USD","value":73733000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-10-31","end":"2025-09-27"},"diluted_eps":{"concept":"EarningsPerShareDiluted","label":"Diluted EPS","unit":"USD/shares","value":7.46,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-10-31","end":"2025-09-27","frame":"CY2025"}},"latestQuarterlyMetrics":{"revenue":{"concept":"RevenueFromContractWithCustomerExcludingAssessedTax","label":"Revenue","unit":"USD","value":254940000000,"fy":2026,"fp":"Q2","form":"10-Q","filed":"2026-05-01","end":"2026-03-28"},"net_income":{"concept":"NetIncomeLoss","label":"Net income","unit":"USD","value":71675000000,"fy":2026,"fp":"Q2","form":"10-Q","filed":"2026-05-01","end":"2026-03-28"},"operating_income":{"concept":"OperatingIncomeLoss","label":"Operating income","unit":"USD","value":86737000000,"fy":2026,"fp":"Q2","form":"10-Q","filed":"2026-05-01","end":"2026-03-28"},"operating_cash_flow":{"concept":"NetCashProvidedByUsedInOperatingActivities","label":"Operating cash flow","unit":"USD","value":82627000000,"fy":2026,"fp":"Q2","form":"10-Q","filed":"2026-05-01","end":"2026-03-28"},"capex":{"concept":"PaymentsToAcquirePropertyPlantAndEquipment","label":"Capital expenditures","unit":"USD","value":4344000000,"fy":2026,"fp":"Q2","form":"10-Q","filed":"2026-05-01","end":"2026-03-28"},"research_and_development":{"concept":"ResearchAndDevelopmentExpense","label":"Research and development expense","unit":"USD","value":22306000000,"fy":2026,"fp":"Q2","form":"10-Q","filed":"2026-05-01","end":"2026-03-28"},"assets":{"concept":"Assets","label":"Assets","unit":"USD","value":371082000000,"fy":2026,"fp":"Q2","form":"10-Q","filed":"2026-05-01","end":"2026-03-28","frame":"CY2026Q1I"},"liabilities":{"concept":"Liabilities","label":"Liabilities","unit":"USD","value":264591000000,"fy":2026,"fp":"Q2","form":"10-Q","filed":"2026-05-01","end":"2026-03-28","frame":"CY2026Q1I"},"equity":{"concept":"StockholdersEquity","label":"Stockholders' equity","unit":"USD","value":106491000000,"fy":2026,"fp":"Q2","form":"10-Q","filed":"2026-05-01","end":"2026-03-28","frame":"CY2026Q1I"},"diluted_eps":{"concept":"EarningsPerShareDiluted","label":"Diluted EPS","unit":"USD/shares","value":4.85,"fy":2026,"fp":"Q2","form":"10-Q","filed":"2026-05-01","end":"2026-03-28"}}},{"recordType":"company_research_snapshot","ticker":"MSFT","companyName":"Microsoft Corporation","cik":"0000789019","thesisTag":"cloud + AI platform","secEntity":{"sic":"7372","sicDescription":"Services-Prepackaged Software","fiscalYearEnd":"0630","exchanges":["Nasdaq"],"tickers":["MSFT"]},"latestAnnualMetrics":{"revenue":{"concept":"RevenueFromContractWithCustomerExcludingAssessedTax","label":"Revenue","unit":"USD","value":281724000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-07-30","end":"2025-06-30","frame":"CY2025"},"net_income":{"concept":"NetIncomeLoss","label":"Net income","unit":"USD","value":101832000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-07-30","end":"2025-06-30","frame":"CY2025"},"operating_income":{"concept":"OperatingIncomeLoss","label":"Operating income","unit":"USD","value":128528000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-07-30","end":"2025-06-30","frame":"CY2025"},"operating_cash_flow":{"concept":"NetCashProvidedByUsedInOperatingActivities","label":"Operating cash flow","unit":"USD","value":136162000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-07-30","end":"2025-06-30","frame":"CY2025"},"capex":{"concept":"PaymentsToAcquirePropertyPlantAndEquipment","label":"Capital expenditures","unit":"USD","value":64551000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-07-30","end":"2025-06-30","frame":"CY2025"},"research_and_development":{"concept":"ResearchAndDevelopmentExpense","label":"Research and development expense","unit":"USD","value":32488000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-07-30","end":"2025-06-30","frame":"CY2025"},"assets":{"concept":"Assets","label":"Assets","unit":"USD","value":619003000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-07-30","end":"2025-06-30"},"liabilities":{"concept":"Liabilities","label":"Liabilities","unit":"USD","value":275524000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-07-30","end":"2025-06-30"},"equity":{"concept":"StockholdersEquity","label":"Stockholders' equity","unit":"USD","value":343479000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-07-30","end":"2025-06-30"},"diluted_eps":{"concept":"EarningsPerShareDiluted","label":"Diluted EPS","unit":"USD/shares","value":13.64,"fy":2025,"fp":"FY","form":"10-K","filed":"2025-07-30","end":"2025-06-30","frame":"CY2025"}},"latestQuarterlyMetrics":{"revenue":{"concept":"RevenueFromContractWithCustomerExcludingAssessedTax","label":"Revenue","unit":"USD","value":241832000000,"fy":2026,"fp":"Q3","form":"10-Q","filed":"2026-04-29","end":"2026-03-31"},"net_income":{"concept":"NetIncomeLoss","label":"Net income","unit":"USD","value":97983000000,"fy":2026,"fp":"Q3","form":"10-Q","filed":"2026-04-29","end":"2026-03-31"},"operating_income":{"concept":"OperatingIncomeLoss","label":"Operating income","unit":"USD","value":114634000000,"fy":2026,"fp":"Q3","form":"10-Q","filed":"2026-04-29","end":"2026-03-31"},"operating_cash_flow":{"concept":"NetCashProvidedByUsedInOperatingActivities","label":"Operating cash flow","unit":"USD","value":127494000000,"fy":2026,"fp":"Q3","form":"10-Q","filed":"2026-04-29","end":"2026-03-31"},"capex":{"concept":"PaymentsToAcquirePropertyPlantAndEquipment","label":"Capital expenditures","unit":"USD","value":80146000000,"fy":2026,"fp":"Q3","form":"10-Q","filed":"2026-04-29","end":"2026-03-31"},"research_and_development":{"concept":"ResearchAndDevelopmentExpense","label":"Research and development expense","unit":"USD","value":25565000000,"fy":2026,"fp":"Q3","form":"10-Q","filed":"2026-04-29","end":"2026-03-31"},"assets":{"concept":"Assets","label":"Assets","unit":"USD","value":694228000000,"fy":2026,"fp":"Q3","form":"10-Q","filed":"2026-04-29","end":"2026-03-31","frame":"CY2026Q1I"},"liabilities":{"concept":"Liabilities","label":"Liabilities","unit":"USD","value":279861000000,"fy":2026,"fp":"Q3","form":"10-Q","filed":"2026-04-29","end":"2026-03-31","frame":"CY2026Q1I"},"equity":{"concept":"StockholdersEquity","label":"Stockholders' equity","unit":"USD","value":414367000000,"fy":2026,"fp":"Q3","form":"10-Q","filed":"2026-04-29","end":"2026-03-31","frame":"CY2026Q1I"},"diluted_eps":{"concept":"EarningsPerShareDiluted","label":"Diluted EPS","unit":"USD/shares","value":13.14,"fy":2026,"fp":"Q3","form":"10-Q","filed":"2026-04-29","end":"2026-03-31"}}},{"recordType":"company_research_snapshot","ticker":"NVDA","companyName":"NVIDIA Corporation","cik":"0001045810","thesisTag":"AI compute infrastructure","secEntity":{"sic":"3674","sicDescription":"Semiconductors \u0026 Related Devices","fiscalYearEnd":"0131","exchanges":["Nasdaq"],"tickers":["NVDA"]},"latestAnnualMetrics":{"revenue":{"concept":"Revenues","label":"Revenue","unit":"USD","value":215938000000,"fy":2026,"fp":"FY","form":"10-K","filed":"2026-02-25","end":"2026-01-25","frame":"CY2025"},"net_income":{"concept":"NetIncomeLoss","label":"Net income","unit":"USD","value":120067000000,"fy":2026,"fp":"FY","form":"10-K","filed":"2026-02-25","end":"2026-01-25"},"operating_income":{"concept":"OperatingIncomeLoss","label":"Operating income","unit":"USD","value":130387000000,"fy":2026,"fp":"FY","form":"10-K","filed":"2026-02-25","end":"2026-01-25","frame":"CY2025"},"operating_cash_flow":{"concept":"NetCashProvidedByUsedInOperatingActivities","label":"Operating cash flow","unit":"USD","value":102718000000,"fy":2026,"fp":"FY","form":"10-K","filed":"2026-02-25","end":"2026-01-25","frame":"CY2025"},"capex":{"concept":"PaymentsToAcquirePropertyPlantAndEquipment","label":"Capital expenditures","unit":"USD","value":138735000,"fy":2011,"fp":"FY","form":"10-K","filed":"2012-03-13","end":"2012-01-29","frame":"CY2011"},"research_and_development":{"concept":"ResearchAndDevelopmentExpense","label":"Research and development expense","unit":"USD","value":18497000000,"fy":2026,"fp":"FY","form":"10-K","filed":"2026-02-25","end":"2026-01-25","frame":"CY2025"},"assets":{"concept":"Assets","label":"Assets","unit":"USD","value":206803000000,"fy":2026,"fp":"FY","form":"10-K","filed":"2026-02-25","end":"2026-01-25"},"liabilities":{"concept":"Liabilities","label":"Liabilities","unit":"USD","value":49510000000,"fy":2026,"fp":"FY","form":"10-K","filed":"2026-02-25","end":"2026-01-25"},"equity":{"concept":"StockholdersEquity","label":"Stockholders' equity","unit":"USD","value":157293000000,"fy":2026,"fp":"FY","form":"10-K","filed":"2026-02-25","end":"2026-01-25"},"diluted_eps":{"concept":"EarningsPerShareDiluted","label":"Diluted EPS","unit":"USD/shares","value":4.9,"fy":2026,"fp":"FY","form":"10-K","filed":"2026-02-25","end":"2026-01-25","frame":"CY2025"}},"latestQuarterlyMetrics":{"revenue":{"concept":"Revenues","label":"Revenue","unit":"USD","value":81615000000,"fy":2027,"fp":"Q1","form":"10-Q","filed":"2026-05-20","end":"2026-04-26","frame":"CY2026Q1"},"net_income":{"concept":"NetIncomeLoss","label":"Net income","unit":"USD","value":58321000000,"fy":2027,"fp":"Q1","form":"10-Q","filed":"2026-05-20","end":"2026-04-26","frame":"CY2026Q1"},"operating_income":{"concept":"OperatingIncomeLoss","label":"Operating income","unit":"USD","value":53536000000,"fy":2027,"fp":"Q1","form":"10-Q","filed":"2026-05-20","end":"2026-04-26","frame":"CY2026Q1"},"operating_cash_flow":{"concept":"NetCashProvidedByUsedInOperatingActivities","label":"Operating cash flow","unit":"USD","value":50344000000,"fy":2027,"fp":"Q1","form":"10-Q","filed":"2026-05-20","end":"2026-04-26","frame":"CY2026Q1"},"capex":{"concept":"PaymentsToAcquirePropertyPlantAndEquipment","label":"Capital expenditures","unit":"USD","value":372000000,"fy":2020,"fp":"Q2","form":"10-Q","filed":"2020-08-19","end":"2020-07-26"},"research_and_development":{"concept":"ResearchAndDevelopmentExpense","label":"Research and development expense","unit":"USD","value":6321000000,"fy":2027,"fp":"Q1","form":"10-Q","filed":"2026-05-20","end":"2026-04-26","frame":"CY2026Q1"},"assets":{"concept":"Assets","label":"Assets","unit":"USD","value":259474000000,"fy":2027,"fp":"Q1","form":"10-Q","filed":"2026-05-20","end":"2026-04-26","frame":"CY2026Q1I"},"liabilities":{"concept":"Liabilities","label":"Liabilities","unit":"USD","value":64000000000,"fy":2027,"fp":"Q1","form":"10-Q","filed":"2026-05-20","end":"2026-04-26","frame":"CY2026Q1I"},"equity":{"concept":"StockholdersEquity","label":"Stockholders' equity","unit":"USD","value":195474000000,"fy":2027,"fp":"Q1","form":"10-Q","filed":"2026-05-20","end":"2026-04-26","frame":"CY2026Q1I"},"diluted_eps":{"concept":"EarningsPerShareDiluted","label":"Diluted EPS","unit":"USD/shares","value":2.39,"fy":2027,"fp":"Q1","form":"10-Q","filed":"2026-05-20","end":"2026-04-26","frame":"CY2026Q1"}}},{"recordType":"company_research_snapshot","ticker":"JPM","companyName":"JPMorgan Chase \u0026 Co.","cik":"0000019617","thesisTag":"systemically important bank","secEntity":{"sic":"6021","sicDescription":"National Commercial Banks","fiscalYearEnd":"1231","exchanges":["NYSE","NYSE","NYSE","NYSE","NYSE","NYSE","NYSE","NYSE","NYSE"],"tickers":["JPM","JPM-PC","AMJB","JPM-PD","JPM-PJ","JPM-PK","JPM-PL","JPM-PM","VYLD"]},"latestAnnualMetrics":{"revenue":{"concept":"Revenues","label":"Revenue","unit":"USD","value":182447000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-13","end":"2025-12-31","frame":"CY2025"},"net_income":{"concept":"NetIncomeLoss","label":"Net income","unit":"USD","value":57048000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-13","end":"2025-12-31"},"operating_income":null,"operating_cash_flow":{"concept":"NetCashProvidedByUsedInOperatingActivities","label":"Operating cash flow","unit":"USD","value":-147782000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-13","end":"2025-12-31","frame":"CY2025"},"capex":null,"research_and_development":null,"assets":{"concept":"Assets","label":"Assets","unit":"USD","value":4424900000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-13","end":"2025-12-31"},"liabilities":{"concept":"Liabilities","label":"Liabilities","unit":"USD","value":4062462000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-13","end":"2025-12-31"},"equity":{"concept":"StockholdersEquity","label":"Stockholders' equity","unit":"USD","value":362438000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-13","end":"2025-12-31"},"diluted_eps":{"concept":"EarningsPerShareDiluted","label":"Diluted EPS","unit":"USD/shares","value":20.02,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-13","end":"2025-12-31","frame":"CY2025"}},"latestQuarterlyMetrics":{"revenue":{"concept":"Revenues","label":"Revenue","unit":"USD","value":71693000000,"fy":2014,"fp":"Q3","form":"10-Q","filed":"2014-11-03","end":"2014-09-30"},"net_income":{"concept":"NetIncomeLoss","label":"Net income","unit":"USD","value":16494000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-01","end":"2026-03-31","frame":"CY2026Q1"},"operating_income":null,"operating_cash_flow":{"concept":"NetCashProvidedByUsedInOperatingActivities","label":"Operating cash flow","unit":"USD","value":-211761000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-01","end":"2026-03-31","frame":"CY2026Q1"},"capex":null,"research_and_development":null,"assets":{"concept":"Assets","label":"Assets","unit":"USD","value":4900475000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-01","end":"2026-03-31","frame":"CY2026Q1I"},"liabilities":{"concept":"Liabilities","label":"Liabilities","unit":"USD","value":4536437000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-01","end":"2026-03-31","frame":"CY2026Q1I"},"equity":{"concept":"StockholdersEquity","label":"Stockholders' equity","unit":"USD","value":364038000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-01","end":"2026-03-31","frame":"CY2026Q1I"},"diluted_eps":{"concept":"EarningsPerShareDiluted","label":"Diluted EPS","unit":"USD/shares","value":5.94,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-01","end":"2026-03-31","frame":"CY2026Q1"}}},{"recordType":"company_research_snapshot","ticker":"XOM","companyName":"Exxon Mobil Corporation","cik":"0000034088","thesisTag":"energy cash-flow proxy","secEntity":{"sic":"2911","sicDescription":"Petroleum Refining","fiscalYearEnd":"1231","exchanges":["NYSE"],"tickers":["XOM"]},"latestAnnualMetrics":{"revenue":{"concept":"Revenues","label":"Revenue","unit":"USD","value":332238000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-18","end":"2025-12-31","frame":"CY2025"},"net_income":{"concept":"NetIncomeLoss","label":"Net income","unit":"USD","value":28844000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-18","end":"2025-12-31"},"operating_income":null,"operating_cash_flow":{"concept":"NetCashProvidedByUsedInOperatingActivities","label":"Operating cash flow","unit":"USD","value":51970000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-18","end":"2025-12-31","frame":"CY2025"},"capex":{"concept":"PaymentsToAcquirePropertyPlantAndEquipment","label":"Capital expenditures","unit":"USD","value":28358000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-18","end":"2025-12-31","frame":"CY2025"},"research_and_development":{"concept":"ResearchAndDevelopmentExpense","label":"Research and development expense","unit":"USD","value":1200000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-18","end":"2025-12-31","frame":"CY2025"},"assets":{"concept":"Assets","label":"Assets","unit":"USD","value":448980000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-18","end":"2025-12-31"},"liabilities":{"concept":"Liabilities","label":"Liabilities","unit":"USD","value":182354000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-18","end":"2025-12-31"},"equity":{"concept":"StockholdersEquity","label":"Stockholders' equity","unit":"USD","value":259386000000,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-18","end":"2025-12-31"},"diluted_eps":{"concept":"EarningsPerShareDiluted","label":"Diluted EPS","unit":"USD/shares","value":6.7,"fy":2025,"fp":"FY","form":"10-K","filed":"2026-02-18","end":"2025-12-31","frame":"CY2025"}},"latestQuarterlyMetrics":{"revenue":{"concept":"Revenues","label":"Revenue","unit":"USD","value":85138000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-04","end":"2026-03-31","frame":"CY2026Q1"},"net_income":{"concept":"NetIncomeLoss","label":"Net income","unit":"USD","value":4183000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-04","end":"2026-03-31","frame":"CY2026Q1"},"operating_income":null,"operating_cash_flow":{"concept":"NetCashProvidedByUsedInOperatingActivities","label":"Operating cash flow","unit":"USD","value":8705000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-04","end":"2026-03-31","frame":"CY2026Q1"},"capex":{"concept":"PaymentsToAcquirePropertyPlantAndEquipment","label":"Capital expenditures","unit":"USD","value":6470000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-04","end":"2026-03-31","frame":"CY2026Q1"},"research_and_development":null,"assets":{"concept":"Assets","label":"Assets","unit":"USD","value":464410000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-04","end":"2026-03-31","frame":"CY2026Q1I"},"liabilities":{"concept":"Liabilities","label":"Liabilities","unit":"USD","value":203414000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-04","end":"2026-03-31","frame":"CY2026Q1I"},"equity":{"concept":"StockholdersEquity","label":"Stockholders' equity","unit":"USD","value":254381000000,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-04","end":"2026-03-31","frame":"CY2026Q1I"},"diluted_eps":{"concept":"EarningsPerShareDiluted","label":"Diluted EPS","unit":"USD/shares","value":1,"fy":2026,"fp":"Q1","form":"10-Q","filed":"2026-05-04","end":"2026-03-31","frame":"CY2026Q1"}}}]},{"id":"finance-latest_sec_filings-jsonl","name":"Latest Sec Filings","type":"JSONL","path":"data/finance-research/latest_sec_filings.jsonl","domain":"finance","records":50,"fields":["ticker","companyName","cik","form","filingDate","reportDate","accessionNumber","primaryDocument","description","secUrl","agentUse"],"workflows":["filing monitoring","risk analysis"],"modalities":["text","table"],"license":"source-specific public data","provenance":"source catalog 2026-06-25","coverage":76,"preview":[{"ticker":"AAPL","companyName":"Apple Inc.","cik":"0000320193","form":"10-Q","filingDate":"2026-05-01","reportDate":"2026-03-28","accessionNumber":"0000320193-26-000013","primaryDocument":"aapl-20260328.htm"},{"ticker":"AAPL","companyName":"Apple Inc.","cik":"0000320193","form":"8-K","filingDate":"2026-04-30","reportDate":"2026-04-30","accessionNumber":"0000320193-26-000011","primaryDocument":"aapl-20260430.htm"},{"ticker":"AAPL","companyName":"Apple Inc.","cik":"0000320193","form":"8-K","filingDate":"2026-04-20","reportDate":"2026-04-17","accessionNumber":"0001140361-26-015711","primaryDocument":"ef20071035_8k.htm"},{"ticker":"AAPL","companyName":"Apple Inc.","cik":"0000320193","form":"8-K","filingDate":"2026-02-24","reportDate":"2026-02-24","accessionNumber":"0001140361-26-006577","primaryDocument":"ef20060722_8k.htm"},{"ticker":"AAPL","companyName":"Apple Inc.","cik":"0000320193","form":"10-Q","filingDate":"2026-01-30","reportDate":"2025-12-27","accessionNumber":"0000320193-26-000006","primaryDocument":"aapl-20251227.htm"}]},{"id":"finance-macro_indicators_latest-csv","name":"Macro Indicators Latest","type":"CSV","path":"data/finance-research/macro_indicators_latest.csv","domain":"finance","records":168,"fields":["indicatorId","indicatorName","frequencyHint","date","value","unit","sourceUrl"],"workflows":["macro context","risk analysis"],"modalities":["text","table"],"license":"source-specific public data","provenance":"source catalog 2026-06-25","coverage":72,"preview":[{"indicatorId":"DGS10","indicatorName":"10-Year Treasury Constant Maturity Rate","frequencyHint":"daily","date":"2026-05-19","value":"4.67","unit":"percent","sourceUrl":"https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10"},{"indicatorId":"DGS10","indicatorName":"10-Year Treasury Constant Maturity Rate","frequencyHint":"daily","date":"2026-05-20","value":"4.57","unit":"percent","sourceUrl":"https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10"},{"indicatorId":"DGS10","indicatorName":"10-Year Treasury Constant Maturity Rate","frequencyHint":"daily","date":"2026-05-21","value":"4.57","unit":"percent","sourceUrl":"https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10"},{"indicatorId":"DGS10","indicatorName":"10-Year Treasury Constant Maturity Rate","frequencyHint":"daily","date":"2026-05-22","value":"4.56","unit":"percent","sourceUrl":"https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10"},{"indicatorId":"DGS10","indicatorName":"10-Year Treasury Constant Maturity Rate","frequencyHint":"daily","date":"2026-05-26","value":"4.5","unit":"percent","sourceUrl":"https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10"}]},{"id":"finance-pm_research_cards-jsonl","name":"Pm Research Cards","type":"JSONL","path":"data/finance-research/pm_research_cards.jsonl","domain":"finance","records":4,"fields":["cardId","title","targetUserQuestion","valueForResearchAgent","structuredFields","exampleTickers","sourceUrls","licenseAndRiskNote","generatedAt"],"workflows":["product research","buyer-facing data cards"],"modalities":["text","table"],"license":"source-specific public data","provenance":"source catalog 2026-06-25","coverage":76,"preview":[{"cardId":"dataset-sec-xbrl-fundamentals","title":"SEC XBRL fundamentals for company-level analysis","targetUserQuestion":"这家公司收入、利润、现金流、研发、资产负债的最新趋势是什么？","valueForResearchAgent":"用官方 XBRL facts 给 Agent 提供可引用的财务事实层，降低幻觉和口径混乱。","structuredFields":["ticker","cik","concept","unit","value","fy","fp","form","filed","end"],"exampleTickers":["AAPL","MSFT","NVDA","JPM","XOM"],"sourceUrls":["https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json"],"licenseAndRiskNote":"SEC EDGAR 数据公开可访问；商用产品仍需保留来源、访问频率和用户代理合规。"},{"cardId":"dataset-sec-filing-events","title":"Recent SEC filing event stream","targetUserQuestion":"最近有哪些 10-K、10-Q、8-K、Proxy 事件值得投研跟进？","valueForResearchAgent":"可以驱动 Agent 的事件监控、公告摘要、风险变化检测和 RAG 引用。","structuredFields":["ticker","form","filingDate","reportDate","description","secUrl","agentUse"],"exampleRecordCount":50,"sourceUrls":["https://data.sec.gov/submissions/CIK0000320193.json"],"licenseAndRiskNote":"SEC filing URL 可回溯到原始公告，适合展示给客户验证。"},{"cardId":"dataset-fred-macro-panel","title":"FRED macro panel for market regime context","targetUserQuestion":"利率、曲线、通胀、就业、波动率环境对公司叙事有什么影响？","valueForResearchAgent":"把公司财务分析和宏观 regime 连接起来，适合做研报前置信息面板。","structuredFields":["indicatorId","indicatorName","date","value","unit","sourceUrl"],"indicatorCount":7,"sourceUrls":["https://fred.stlouisfed.org/series/DGS10","https://fred.stlouisfed.org/series/DGS2","https://fred.stlouisfed.org/series/T10Y2Y","https://fred.stlouisfed.org/series/FEDFUNDS","https://fred.stlouisfed.org/series/CPIAUCSL","https://fred.stlouisfed.org/series/UNRATE","https://fred.stlouisfed.org/series/VIXCLS"],"licenseAndRiskNote":"FRED 是公开宏观数据入口；不同原始发布机构可能有独立引用要求。"},{"cardId":"dataset-nasdaq-recent-ohlcv","title":"Recent Nasdaq OHLCV context","targetUserQuestion":"财报/公告前后，股票价格和成交量有没有异常？","valueForResearchAgent":"给公告分析加市场反应上下文，但不建议作为生产行情主数据源。","structuredFields":["ticker","date","open","high","low","close","volume","sourceUrl"],"exampleRecordCount":185,"sourceUrls":["https://api.nasdaq.com/api/quote/AAPL/historical?assetclass=stocks\u0026fromdate=2026-05-01\u0026todate=2026-06-25\u0026limit=9999","https://api.nasdaq.com/api/quote/MSFT/historical?assetclass=stocks\u0026fromdate=2026-05-01\u0026todate=2026-06-25\u0026limit=9999","https://api.nasdaq.com/api/quote/NVDA/historical?assetclass=stocks\u0026fromdate=2026-05-01\u0026todate=2026-06-25\u0026limit=9999","https://api.nasdaq.com/api/quote/JPM/historical?assetclass=stocks\u0026fromdate=2026-05-01\u0026todate=2026-06-25\u0026limit=9999","https://api.nasdaq.com/api/quote/XOM/historical?assetclass=stocks\u0026fromdate=2026-05-01\u0026todate=2026-06-25\u0026limit=9999"],"licenseAndRiskNote":"适合 demo 和原型验证；商用行情数据建议接入正式授权供应商。"}]},{"id":"finance-recent_market_prices-csv","name":"Recent Market Prices","type":"CSV","path":"data/finance-research/recent_market_prices.csv","domain":"finance","records":185,"fields":["ticker","date","open","high","low","close","volume","sourceUrl"],"workflows":["market context","price review"],"modalities":["text","table"],"license":"source-specific public data","provenance":"source catalog 2026-06-25","coverage":72,"preview":[{"ticker":"AAPL","date":"2026-06-24","open":"295.355","high":"299.7","low":"292.94","close":"293.08","volume":"53081860","sourceUrl":"https://api.nasdaq.com/api/quote/AAPL/historical?assetclass=stocks\u0026fromdate=2026-05-01\u0026todate=2026-06-25\u0026limit=9999"},{"ticker":"AAPL","date":"2026-06-23","open":"297.538","high":"301.64","low":"294.18","close":"294.3","volume":"52010930","sourceUrl":"https://api.nasdaq.com/api/quote/AAPL/historical?assetclass=stocks\u0026fromdate=2026-05-01\u0026todate=2026-06-25\u0026limit=9999"},{"ticker":"AAPL","date":"2026-06-22","open":"297.31","high":"302.42","low":"296.76","close":"297.01","volume":"44879910","sourceUrl":"https://api.nasdaq.com/api/quote/AAPL/historical?assetclass=stocks\u0026fromdate=2026-05-01\u0026todate=2026-06-25\u0026limit=9999"},{"ticker":"AAPL","date":"2026-06-18","open":"298.11","high":"300.57","low":"295.62","close":"298.01","volume":"85962200","sourceUrl":"https://api.nasdaq.com/api/quote/AAPL/historical?assetclass=stocks\u0026fromdate=2026-05-01\u0026todate=2026-06-25\u0026limit=9999"},{"ticker":"AAPL","date":"2026-06-17","open":"300.845","high":"302.07","low":"294.36","close":"295.95","volume":"42745060","sourceUrl":"https://api.nasdaq.com/api/quote/AAPL/historical?assetclass=stocks\u0026fromdate=2026-05-01\u0026todate=2026-06-25\u0026limit=9999"}]},{"id":"finance-source-catalog","name":"金融研究 Source Catalog","type":"JSON","path":"data/finance-research/source_catalog.json","domain":"finance","records":4,"fields":["id","name","sourceType","url","highValueBecause","redistributionRisk","productionNotes"],"workflows":["provenance review","license review"],"modalities":["metadata"],"license":"source-specific","provenance":"2026-06-25","coverage":68,"preview":[{"id":"sec-companyfacts","name":"SEC EDGAR Company Facts API","sourceType":"official_regulatory_api","url":"https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json","highValueBecause":["auditable financial facts","standard XBRL concepts","filing-level provenance"],"redistributionRisk":"low_to_medium","productionNotes":["set a descriptive User-Agent","cache responses","respect SEC request-rate guidance"]},{"id":"sec-submissions","name":"SEC EDGAR Submissions API","sourceType":"official_regulatory_api","url":"https://data.sec.gov/submissions/CIK0000320193.json","highValueBecause":["latest filing stream","primary document links","event monitoring"],"redistributionRisk":"low_to_medium","productionNotes":["normalize CIKs","store accession numbers","link every derived claim to source URL"]},{"id":"fred","name":"FRED CSV downloads","sourceType":"public_macro_data_portal","url":"https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10","highValueBecause":["macro regime features","simple CSV ingestion","long history"],"redistributionRisk":"medium","productionNotes":["retain series IDs","show units and frequency","check original source citation requirements"]},{"id":"nasdaq-historical","name":"Nasdaq historical quote endpoint","sourceType":"public_market_data_endpoint","url":"https://api.nasdaq.com/api/quote/AAPL/historical?assetclass=stocks\u0026fromdate=2026-05-01\u0026todate=2026-06-25\u0026limit=9999","highValueBecause":["recent OHLCV context","event-window analysis","client-friendly price tables"],"redistributionRisk":"high","productionNotes":["use only for prototype/demo","replace with licensed market-data vendor in production"]}]}],"files":[{"path":"data/finance-research/company_metrics.csv","type":"csv","sizeKb":19},{"path":"data/finance-research/company_snapshots.jsonl","type":"jsonl","sizeKb":25},{"path":"data/finance-research/latest_sec_filings.jsonl","type":"jsonl","sizeKb":21},{"path":"data/finance-research/macro_indicators_latest.csv","type":"csv","sizeKb":22},{"path":"data/finance-research/pm_research_cards.jsonl","type":"jsonl","sizeKb":3},{"path":"data/finance-research/recent_market_prices.csv","type":"csv","sizeKb":30},{"path":"data/finance-research/source_catalog.json","type":"json","sizeKb":2},{"path":"data/taxonomy/industries.json","type":"json","sizeKb":3},{"path":"docs/.nojekyll","type":"file","sizeKb":1},{"path":"docs/business-brief.md","type":"md","sizeKb":1},{"path":"docs/customer-support-bench.md","type":"md","sizeKb":1},{"path":"docs/data-governance-dashboard.html","type":"html","sizeKb":57},{"path":"docs/finance-research-dashboard.html","type":"html","sizeKb":28},{"path":"docs/finance-research-data-pack.md","type":"md","sizeKb":5},{"path":"docs/index.html","type":"html","sizeKb":57},{"path":"examples/customer-support-bench.jsonl","type":"jsonl","sizeKb":12},{"path":"examples/minimal-cases.jsonl","type":"jsonl","sizeKb":1}]}</script>
+    <script>
+      const state = JSON.parse(document.getElementById("dashboard-data").textContent);
+      const activeDomains = new Set(state.datasets.map((item) => item.domain));
+      let selectedId = state.datasets[0]?.id || null;
+
+      const domainList = document.getElementById("domainList");
+      const assetRows = document.getElementById("assetRows");
+      const detailPanel = document.getElementById("detailPanel");
+      const search = document.getElementById("search");
+      const domainFilter = document.getElementById("domainFilter");
+      const typeFilter = document.getElementById("typeFilter");
+
+      function renderDomains() {
+        domainList.innerHTML = state.taxonomy.map((domain) => {
+          const live = activeDomains.has(domain.slug);
+          return `
+            <button class="domain-button ${domainFilter.value === domain.slug ? "active" : ""}" data-domain="${domain.slug}" title="${domain.description}">
+              <span>${domain.label}</span>
+              <i class="status-dot ${live ? "live" : ""}"></i>
+            </button>
+          `;
+        }).join("");
+      }
+
+      function filteredDatasets() {
+        const term = search.value.trim().toLowerCase();
+        return state.datasets.filter((item) => {
+          const text = JSON.stringify(item).toLowerCase();
+          return (domainFilter.value === "all" || item.domain === domainFilter.value)
+            && (typeFilter.value === "all" || item.type === typeFilter.value)
+            && (!term || text.includes(term));
+        });
+      }
+
+      function renderRows() {
+        const rows = filteredDatasets();
+        if (!rows.some((item) => item.id === selectedId)) selectedId = rows[0]?.id || null;
+        assetRows.innerHTML = rows.map((item) => `
+          <tr data-id="${item.id}" class="${item.id === selectedId ? "selected" : ""}">
+            <td>
+              <div class="asset-name">
+                <strong>${item.name}</strong>
+                <span>${item.path}</span>
+                <div class="badge-row">
+                  <span class="badge">${item.domain}</span>
+                  <span class="badge">${item.type}</span>
+                  <span class="badge">${item.license}</span>
+                </div>
+              </div>
+            </td>
+            <td><strong>${item.records}</strong><div class="caption">${item.fields.length} fields</div></td>
+            <td><div class="badge-row">${item.workflows.slice(0, 3).map((workflow) => `<span class="badge">${workflow}</span>`).join("")}</div></td>
+            <td>
+              <div class="coverage">
+                <strong>${item.coverage}%</strong>
+                <div class="bar"><i style="width: ${item.coverage}%"></i></div>
+              </div>
+            </td>
+          </tr>
+        `).join("") || `<tr><td colspan="4"><div class="caption">没有匹配数据</div></td></tr>`;
+        renderDetail();
+      }
+
+      function renderDetail() {
+        const item = state.datasets.find((dataset) => dataset.id === selectedId);
+        if (!item) {
+          detailPanel.innerHTML = '<div class="detail-empty">选择一条数据资产</div>';
+          return;
+        }
+        detailPanel.innerHTML = `
+          <div class="detail-stack">
+            <div class="detail-block">
+              <h3>${item.name}</h3>
+              <p class="caption">${item.path}</p>
+            </div>
+            <div class="detail-block">
+              <div class="kv"><span>Domain</span><strong>${item.domain}</strong></div>
+              <div class="kv"><span>Type</span><strong>${item.type}</strong></div>
+              <div class="kv"><span>Records</span><strong>${item.records}</strong></div>
+              <div class="kv"><span>Fields</span><strong>${item.fields.join(", ")}</strong></div>
+              <div class="kv"><span>License</span><strong>${item.license}</strong></div>
+              <div class="kv"><span>Provenance</span><strong>${item.provenance}</strong></div>
+            </div>
+            <div class="detail-block">
+              <h3>Sample</h3>
+              <pre>${escapeHtml(JSON.stringify(item.preview, null, 2))}</pre>
+            </div>
+          </div>
+        `;
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      domainList.addEventListener("click", (event) => {
+        const button = event.target.closest(".domain-button");
+        if (!button) return;
+        domainFilter.value = activeDomains.has(button.dataset.domain) ? button.dataset.domain : "all";
+        renderDomains();
+        renderRows();
+      });
+
+      assetRows.addEventListener("click", (event) => {
+        const row = event.target.closest("tr[data-id]");
+        if (!row) return;
+        selectedId = row.dataset.id;
+        renderRows();
+      });
+
+      search.addEventListener("input", renderRows);
+      domainFilter.addEventListener("change", () => { renderDomains(); renderRows(); });
+      typeFilter.addEventListener("change", renderRows);
+
+      renderDomains();
+      renderRows();
+    </script>
+  </body>
+</html>

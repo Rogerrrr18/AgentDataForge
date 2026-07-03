@@ -9,7 +9,8 @@
     "build": "tsc -p tsconfig.json",
     "test": "node --import tsx --test tests/*.test.ts",
     "forge": "tsx src/cli/index.ts",
-    "finance:pack": "tsx scripts/build-finance-research-pack.ts"
+    "finance:pack": "tsx scripts/build-finance-research-pack.ts",
+    "ui:build": "tsx scripts/build-data-governance-ui.ts"
   },
   "bin": {
     "agent-data-forge": "./dist/cli/index.js"
