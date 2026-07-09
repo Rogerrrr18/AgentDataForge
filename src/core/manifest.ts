@@ -3,6 +3,7 @@
  */
 
 import type { BenchmarkCase, BenchmarkManifest, DatasetCandidate } from "../types.js";
+import { inferCaseLicenseName } from "./case-utils.js";
 import { buildDataValueEnhancementPlan } from "./enrichment.js";
 import { profileIndustry } from "./industry.js";
 import { profileDatasetSchema } from "./schema-profiler.js";
@@ -43,16 +44,6 @@ export function buildBenchmarkManifest(input: {
     enrichmentPlan,
     recommendedNextActions: recommendedNextActions(schemaProfile.missingCriticalFields),
   };
-}
-
-function inferCaseLicenseName(cases: BenchmarkCase[]): string | null {
-  for (const item of cases) {
-    const record = item as Record<string, unknown>;
-    const metadata = item.metadata ?? {};
-    const licenseName = record.licenseName ?? record.license ?? metadata.licenseName ?? metadata.license;
-    if (typeof licenseName === "string" && licenseName.trim()) return licenseName.trim();
-  }
-  return null;
 }
 
 function recommendedNextActions(missing: string[]): string[] {

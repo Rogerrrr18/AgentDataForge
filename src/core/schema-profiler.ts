@@ -10,6 +10,7 @@ import type {
   SchemaSignal,
   SchemaSignalKey,
 } from "../types.js";
+import { inferCaseLicenseName } from "./case-utils.js";
 
 const SIGNAL_WEIGHTS: Record<SchemaSignalKey, number> = {
   taskInstruction: 0.11,
@@ -121,16 +122,6 @@ function hasAnyCaseField(cases: BenchmarkCase[], fields: string[]): boolean {
     const record = item as Record<string, unknown>;
     return fields.some((field) => typeof record[field] !== "undefined");
   });
-}
-
-function inferCaseLicenseName(cases: BenchmarkCase[]): string | null {
-  for (const item of cases) {
-    const record = item as Record<string, unknown>;
-    const metadata = item.metadata ?? {};
-    const licenseName = record.licenseName ?? record.license ?? metadata.licenseName ?? metadata.license;
-    if (typeof licenseName === "string" && licenseName.trim()) return licenseName.trim();
-  }
-  return null;
 }
 
 function inferEvaluatorCandidates(
