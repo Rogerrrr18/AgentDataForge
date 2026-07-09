@@ -3,10 +3,11 @@
  *
  * Validated with zod (an existing project dependency). Industry slugs are
  * checked against the shared taxonomy so specs fail fast with an actionable
- * error rather than producing off-domain data.
+ * error rather than producing off-domain data. Spec files may be JSON or YAML.
  */
 
 import { readFile } from "node:fs/promises";
+import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 import { getIndustryTaxonomy } from "../core/industry.js";
 import type { AgentTaskType } from "../types.js";
@@ -69,17 +70,31 @@ export function parseTaskSpec(input: unknown, source = "<inline>"): TaskSpec {
 }
 
 /**
- * Load and validate a TaskSpec from a JSON file.
+ * Parse a spec file body as JSON or YAML based on the file extension.
  */
-export async function loadTaskSpec(filePath: string): Promise<TaskSpec> {
-  const text = await readFile(filePath, "utf8");
-  let json: unknown;
+export function parseSpecText(text: string, filePath: string): unknown {
+  if (/\.ya?ml$/i.test(filePath)) {
+    try {
+      return parseYaml(text);
+    } catch (error) {
+      throw new Error(
+        `TaskSpec YAML is invalid at ${filePath}: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
   try {
-    json = JSON.parse(text);
+    return JSON.parse(text);
   } catch (error) {
     throw new Error(
       `TaskSpec JSON is invalid at ${filePath}: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
-  return parseTaskSpec(json, filePath);
+}
+
+/**
+ * Load and validate a TaskSpec from a JSON or YAML file.
+ */
+export async function loadTaskSpec(filePath: string): Promise<TaskSpec> {
+  const text = await readFile(filePath, "utf8");
+  return parseTaskSpec(parseSpecText(text, filePath), filePath);
 }

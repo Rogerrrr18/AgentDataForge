@@ -1,9 +1,10 @@
 /**
- * @fileoverview Robust parsing of an LLM completion into a BenchmarkCase.
+ * @fileoverview Robust parsing of LLM completions into JSON objects.
  *
  * The model is unreliable, so parsing strips markdown fences and surrounding
- * prose, then validates the minimal structure (an object with a string caseId).
- * Field-level completeness is left to the schema profiler downstream.
+ * prose before JSON-parsing. extractJsonObject / tryParseJsonObject are shared
+ * primitives (the judge reuses them); parseCaseCompletion adds the caseId
+ * requirement on top.
  */
 
 import type { BenchmarkCase } from "../types.js";
@@ -13,10 +14,47 @@ export type ParseResult =
   | { ok: false; reason: string; raw: string };
 
 /**
- * Parse a single LLM completion into a BenchmarkCase.
+ * Strip markdown fences and surrounding prose, returning the outermost {...}
+ * block (or the trimmed text when no braces are present).
+ */
+export function extractJsonObject(text: string): string {
+  let value = text.trim();
+
+  // ```json ... ``` or ``` ... ```
+  const fenceMatch = value.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fenceMatch) {
+    value = fenceMatch[1].trim();
+  }
+
+  // Isolate the outermost {...} block if prose still surrounds it.
+  const first = value.indexOf("{");
+  const last = value.lastIndexOf("}");
+  if (first !== -1 && last !== -1 && last > first) {
+    value = value.slice(first, last + 1);
+  }
+
+  return value;
+}
+
+/**
+ * Parse a completion into a plain object, tolerating fences/prose.
+ * Returns null on any parse failure or non-object result.
+ */
+export function tryParseJsonObject(text: string): Record<string, unknown> | null {
+  try {
+    const json: unknown = JSON.parse(extractJsonObject(text));
+    if (typeof json !== "object" || json === null || Array.isArray(json)) return null;
+    return json as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Parse a single LLM completion into a BenchmarkCase (requires a string caseId).
  */
 export function parseCaseCompletion(text: string): ParseResult {
-  const cleaned = stripFencesAndProse(text);
+  const cleaned = extractJsonObject(text);
   let json: unknown;
   try {
     json = JSON.parse(cleaned);
@@ -34,23 +72,4 @@ export function parseCaseCompletion(text: string): ParseResult {
   }
 
   return { ok: true, caseRecord: json as BenchmarkCase };
-}
-
-function stripFencesAndProse(text: string): string {
-  let value = text.trim();
-
-  // ```json ... ``` or ``` ... ```
-  const fenceMatch = value.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  if (fenceMatch) {
-    value = fenceMatch[1].trim();
-  }
-
-  // Isolate the outermost {...} block if prose still surrounds it.
-  const first = value.indexOf("{");
-  const last = value.lastIndexOf("}");
-  if (first !== -1 && last !== -1 && last > first) {
-    value = value.slice(first, last + 1);
-  }
-
-  return value;
 }

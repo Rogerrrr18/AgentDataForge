@@ -3,9 +3,10 @@
  *
  * Required: LLM_API_KEY, LLM_MODEL.
  * Optional: LLM_BASE_URL (default OpenAI), LLM_TEMPERATURE, LLM_TIMEOUT_MS,
- *           LLM_JSON_MODE.
+ *           LLM_JSON_MODE, LLM_EMBED_MODEL (for semantic dedupe).
  */
 
+import { createEmbeddingClient, type EmbeddingClient } from "./embeddings.js";
 import { createOpenAICompatibleClient } from "./openai-compatible.js";
 import type { LLMClient } from "./types.js";
 
@@ -20,12 +21,13 @@ export type LLMEnvConfig = {
 
 const MISSING_CONFIG_HINT = `Set the following environment variables to enable LLM synthesis:
 
-  LLM_API_KEY      your provider API key (required)
-  LLM_MODEL        model id, e.g. gpt-4o-mini, deepseek-chat (required)
-  LLM_BASE_URL     OpenAI-compatible endpoint (default: https://api.openai.com/v1)
-  LLM_TEMPERATURE  sampling temperature (default: 0.8)
-  LLM_TIMEOUT_MS   request timeout in ms (default: 60000)
-  LLM_JSON_MODE    "false" if your endpoint rejects response_format (default: true)
+  LLM_API_KEY        your provider API key (required)
+  LLM_MODEL          model id, e.g. gpt-4o-mini, deepseek-chat (required)
+  LLM_BASE_URL       OpenAI-compatible endpoint (default: https://api.openai.com/v1)
+  LLM_TEMPERATURE    sampling temperature (default: 0.8)
+  LLM_TIMEOUT_MS     request timeout in ms (default: 60000)
+  LLM_JSON_MODE      "false" if your endpoint rejects response_format (default: true)
+  LLM_EMBED_MODEL    embedding model for semantic dedupe (default: LLM_MODEL)
 
 Most providers (OpenAI, DeepSeek, Qwen, Zhipu, Moonshot, vLLM, Ollama) speak the
 OpenAI /chat/completions format, so only LLM_API_KEY + LLM_MODEL are usually needed.`;
@@ -71,6 +73,21 @@ export function createLLMClient(env: NodeJS.ProcessEnv = process.env): LLMClient
     temperature: config.temperature,
     timeoutMs: config.timeoutMs,
     jsonMode: config.jsonMode,
+  });
+}
+
+/**
+ * Create an embedding client from the environment. Uses LLM_EMBED_MODEL if set,
+ * otherwise falls back to LLM_MODEL. Shares base URL/key with the chat client.
+ */
+export function createEmbeddingClientFromEnv(env: NodeJS.ProcessEnv = process.env): EmbeddingClient {
+  const config = readLLMConfig(env);
+  const model = env.LLM_EMBED_MODEL?.trim() || config.model;
+  return createEmbeddingClient({
+    baseUrl: config.baseUrl,
+    apiKey: config.apiKey,
+    model,
+    timeoutMs: config.timeoutMs,
   });
 }
 
