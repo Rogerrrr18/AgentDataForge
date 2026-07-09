@@ -1,0 +1,17 @@
+{
+  "name": "customer-support-synth",
+  "industry": "customer-service",
+  "taskType": "tool_use",
+  "count": 10,
+  "mode": "seeded",
+  "seedCases": "../customer-support-bench.jsonl",
+  "fields": ["input", "expected", "context", "rubric", "checker", "trace", "environment"],
+  "constraints": [
+    "Cover refund, return, and escalation scenarios in roughly equal proportion.",
+    "Difficulty distribution: easy 50%, medium 35%, hard 15%.",
+    "Every referenced tool must appear in trace.allowedTools and have a matching environment fixture."
+  ],
+  "diversity": {
+    "personas": ["angry customer", "confused elderly user", "enterprise account manager"]
+  }
+}

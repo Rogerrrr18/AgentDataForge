@@ -5,6 +5,12 @@
 import { readFile } from "node:fs/promises";
 import { discoverCandidates } from "../core/discovery.js";
 import { buildBenchmarkManifest } from "../core/manifest.js";
+import { loadCasesJsonl } from "../synthesis/case-loader.js";
+import { createLLMClient } from "../synthesis/llm/config.js";
+import { buildFromScratchPrompt } from "../synthesis/prompts/from-scratch.js";
+import { buildSeededPrompt } from "../synthesis/prompts/seeded.js";
+import { runSynthesis } from "../synthesis/pipeline.js";
+import { loadTaskSpec } from "../synthesis/spec.js";
 import type { BenchmarkCase } from "../types.js";
 
 const [, , command, ...args] = process.argv;
@@ -40,6 +46,26 @@ if (command === "manifest") {
   process.exit(0);
 }
 
+if (command === "synthesize") {
+  const specPath = args[0];
+  if (!specPath) fail("Usage: agent-data-forge synthesize <spec.json> [--limit 10] [--out path] [--dry-run]");
+  const limitFlag = readFlag(args, "--limit");
+  const limit = limitFlag ? Number(limitFlag) : undefined;
+  const outPath = readFlag(args, "--out");
+  try {
+    if (args.includes("--dry-run")) {
+      await printSynthesizePreview(specPath, limit);
+    } else {
+      const client = createLLMClient();
+      const { report } = await runSynthesis({ specPath, client, limit, outPath });
+      writeJson(report);
+    }
+    process.exit(0);
+  } catch (error) {
+    fail(error instanceof Error ? error.message : String(error));
+  }
+}
+
 fail(`Unknown command: ${command}`);
 
 function parseJsonlCases(text: string): BenchmarkCase[] {
@@ -71,15 +97,31 @@ function fail(message: string): never {
   process.exit(1);
 }
 
+async function printSynthesizePreview(specPath: string, limit: number | undefined): Promise<void> {
+  const spec = await loadTaskSpec(specPath);
+  const count = limit ?? spec.count;
+  const seeds = spec.mode === "seeded" && spec.seedCases
+    ? await loadCasesJsonl(specPath, spec.seedCases)
+    : undefined;
+  const built = spec.mode === "seeded" && seeds && seeds.length > 0
+    ? buildSeededPrompt({ spec, seeds, index: 0, count })
+    : buildFromScratchPrompt({ spec, index: 0, count });
+  process.stdout.write(`--- spec: ${spec.name} (mode=${spec.mode}, count=${count}) ---\n`);
+  process.stdout.write(`\n=== SYSTEM ===\n${built.system}\n`);
+  process.stdout.write(`\n=== USER ===\n${built.user}\n`);
+}
+
 function printHelp(): void {
   process.stdout.write(`AgentDataForge
 
 Commands:
   discover <query> [--source huggingface|github|all] [--limit 10]
   manifest <cases.jsonl>
+  synthesize <spec.json> [--limit 10] [--out path] [--dry-run]
 
 Examples:
   npm run forge -- discover "customer support agent benchmark" --source huggingface --limit 5
   npm run forge -- manifest examples/minimal-cases.jsonl
+  npm run forge -- synthesize examples/synth-specs/customer-support.json --dry-run
 `);
 }
