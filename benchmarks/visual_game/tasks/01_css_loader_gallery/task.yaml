@@ -1,0 +1,41 @@
+id: "css_loader_gallery"
+name: "CSS 加载动画画廊"
+description: "单文件 HTML，纯 CSS（零 JS）实现 6 个风格各异的加载动画。"
+category: visual_game
+difficulty: easy
+
+tags:
+  - visual
+  - css
+
+capabilities:
+  CE-1:
+    name: "HTML/CSS 布局与样式"
+    definition: "纯 CSS 实现布局与视觉元素，无 JS"
+    pass_criteria: "无 <script>，6 个 loader 元素布局合理"
+    evidence: "deliverables/index.html + rubric static_meta.has_script=false"
+    weight: 1.0
+  VD-1:
+    name: "色彩与配色"
+    definition: "6 个 loader 配色协调且彼此可区分"
+    pass_criteria: "视觉裁判 image_dimensions.color ≥ 0.6"
+    evidence: "VLM image score"
+    weight: 1.0
+  VD-3:
+    name: "动画时序与缓动"
+    definition: "6 个 loader 都在持续动画"
+    pass_criteria: "computed animation-name 非 none 的元素 ≥ 6"
+    evidence: "rubric interact observations"
+    weight: 1.0
+  VD-5:
+    name: "审美判断"
+    definition: "整体观感协调、现代"
+    pass_criteria: "视觉裁判 image_dimensions.aesthetics ≥ 0.6"
+    evidence: "VLM image score"
+    weight: 1.0
+  IC-2:
+    name: "创造力/原创性"
+    definition: "6 个 loader 视觉上彼此 distinct（不同 animation-name/形态）"
+    pass_criteria: "distinct animation-name ≥ 6"
+    evidence: "rubric interact observations"
+    weight: 1.0

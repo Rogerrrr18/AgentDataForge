@@ -1,0 +1,48 @@
+id: "game_2048"
+name: "2048 滑块合并"
+description: "单文件 HTML 实现完整 2048：4x4 棋盘、方向键滑动合并、随机生成 2/4、胜负判定、滑行动画。"
+category: visual_game
+difficulty: medium
+
+tags:
+  - visual
+  - canvas
+  - game
+
+capabilities:
+  RS-2:
+    name: "算法思维（合并逻辑）"
+    definition: "滑动合并算法正确（同值翻倍、方向压缩）"
+    pass_criteria: "注入已知棋盘后，按方向得到正确合并结果"
+    evidence: "rubric interact（merge assertion）"
+    weight: 1.0
+  CE-4:
+    name: "游戏循环与状态机"
+    definition: "每次移动生成新块、状态更新"
+    pass_criteria: "移动后非空格数 +1（spawn）"
+    evidence: "rubric interact"
+    weight: 1.0
+  RS-3:
+    name: "规则执行"
+    definition: "2048 胜利 / 满盘失败判定"
+    pass_criteria: "出现 2048 → won；满盘不可动 → over"
+    evidence: "rubric interact"
+    weight: 0.8
+  CE-5:
+    name: "交互与输入处理"
+    definition: "方向键响应"
+    pass_criteria: "按键后棋盘变化"
+    evidence: "rubric interact"
+    weight: 1.0
+  VD-3:
+    name: "动画时序与缓动"
+    definition: "滑动/合并有过渡动画"
+    pass_criteria: "视觉裁判 video_dimensions.smoothness ≥ 0.6"
+    evidence: "VLM video score"
+    weight: 0.6
+  MP-5:
+    name: "概率与随机"
+    definition: "新块以 2(90%)/4(10%) 随机生成在空格"
+    pass_criteria: "移动后有新块生成"
+    evidence: "rubric interact（spawn）"
+    weight: 0.8
