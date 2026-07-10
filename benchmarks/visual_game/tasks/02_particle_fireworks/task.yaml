@@ -1,0 +1,60 @@
+id: "particle_fireworks"
+name: "Canvas 粒子烟花"
+description: "单文件 HTML，Canvas 实现点击发射烟花：粒子带重力下落、拖尾、爆炸、颜色衰减，空闲自动循环。"
+category: visual_game
+difficulty: easy
+
+tags:
+  - visual
+  - canvas
+  - game
+
+capabilities:
+  CE-2:
+    name: "Canvas 2D 渲染"
+    definition: "正确使用 Canvas 2D API 绘制粒子"
+    pass_criteria: "canvas 存在、无 console error、画面随时间变化"
+    evidence: "rubric dimensions"
+    weight: 1.0
+  CE-5:
+    name: "交互与输入处理"
+    definition: "点击触发新粒子发射"
+    pass_criteria: "点击后 canvas 像素 checksum 改变"
+    evidence: "rubric interact"
+    weight: 1.0
+  MP-1:
+    name: "几何与三角"
+    definition: "粒子沿角度发散（爆炸）"
+    pass_criteria: "代码含角度/三角或随机方向发射"
+    evidence: "html 源码 grep"
+    weight: 0.8
+  MP-3:
+    name: "物理仿真"
+    definition: "粒子受重力下落"
+    pass_criteria: "代码含重力/纵向速度累加"
+    evidence: "html 源码 grep"
+    weight: 1.0
+  MP-4:
+    name: "粒子系统"
+    definition: "维护粒子数组并批量更新"
+    pass_criteria: "代码含 particle 数组与更新循环"
+    evidence: "html 源码 grep"
+    weight: 1.0
+  VD-1:
+    name: "色彩与配色"
+    definition: "烟花配色丰富、颜色衰减自然"
+    pass_criteria: "视觉裁判 image_dimensions.color ≥ 0.6"
+    evidence: "VLM image score"
+    weight: 0.8
+  VD-3:
+    name: "动画时序与缓动"
+    definition: "空闲也持续有动效（自动循环）"
+    pass_criteria: "t0/t1 采样不同（在动）"
+    evidence: "rubric animating"
+    weight: 1.0
+  IC-2:
+    name: "创造力/原创性"
+    definition: "视觉效果有美感与冲击力"
+    pass_criteria: "视觉裁判 image_dimensions.aesthetics ≥ 0.6"
+    evidence: "VLM image score"
+    weight: 0.8

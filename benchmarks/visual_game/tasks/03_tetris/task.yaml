@@ -1,0 +1,54 @@
+id: "tetris"
+name: "俄罗斯方块"
+description: "单文件 HTML 实现完整俄罗斯方块：7 种方块、旋转、下落、消行、计分、下一块预览、game over。"
+category: visual_game
+difficulty: medium
+
+tags:
+  - visual
+  - canvas
+  - game
+
+capabilities:
+  CE-2:
+    name: "Canvas 2D 渲染"
+    definition: "用 canvas 绘制棋盘与方块"
+    pass_criteria: "canvas 存在、无 console error"
+    evidence: "rubric dimensions"
+    weight: 1.0
+  CE-4:
+    name: "游戏循环与状态机"
+    definition: "稳定的下落循环 + 状态管理"
+    pass_criteria: "无输入时方块随时间下落（棋盘变化）"
+    evidence: "rubric interact"
+    weight: 1.0
+  CE-5:
+    name: "交互与输入处理"
+    definition: "方向键移动/旋转/加速下落"
+    pass_criteria: "按键后棋盘状态变化"
+    evidence: "rubric interact"
+    weight: 1.0
+  MP-1:
+    name: "几何与三角"
+    definition: "方块旋转矩阵正确"
+    pass_criteria: "旋转后占用格集合改变且仍合法"
+    evidence: "rubric interact（rotation）"
+    weight: 1.0
+  RS-3:
+    name: "规则执行"
+    definition: "消行/越界/落定规则正确"
+    pass_criteria: "填满一行后被消除（棋盘该行清空）"
+    evidence: "rubric interact（line clear）"
+    weight: 1.0
+  RS-4:
+    name: "复杂指令遵循"
+    definition: "按规格暴露测试钩子"
+    pass_criteria: "window.__GAME 暴露 board/score/over"
+    evidence: "rubric interact"
+    weight: 0.8
+  VD-2:
+    name: "构图与版式"
+    definition: "棋盘 + 下一个预览 + 分数布局清晰"
+    pass_criteria: "视觉裁判 image_dimensions.composition ≥ 0.6"
+    evidence: "VLM image score"
+    weight: 0.8
